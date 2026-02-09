@@ -11,11 +11,13 @@ interface Props {
 export const Input = ({ label, value, iconUrl, variant, setValue }: Props) => {
 
     const [localValue, setLocalValue] = useState(value.toString());
+    const [error, setError] = useState(false)
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const userInput = e.target.value;
 
-        const numbersRegExp = /^\d+$/;
-        const decimalRegExp = /^\d+(\.\d+)?$/;
+        const numbersRegExp = /^\d*$/;
+        const decimalRegExp = /^\d*(\.)?\d*$/;
 
         const regExp = variant === "bill" ? decimalRegExp : numbersRegExp;
 
@@ -25,7 +27,12 @@ export const Input = ({ label, value, iconUrl, variant, setValue }: Props) => {
         //UI
         setLocalValue(userInput)
         //store
-        setValue(Number(userInput))
+        if (userInput === "0" || userInput.trim() === "") {
+            setError(true);
+        } else {
+            setError(false);
+            setValue(Number(userInput));
+        }
     }
 
     return (
@@ -37,7 +44,9 @@ export const Input = ({ label, value, iconUrl, variant, setValue }: Props) => {
                 >
                     {label}
                 </label>
-                <p className="text-Orange-400 font-bold hidden ">Can´t be zero </p>
+                {
+                    error && (<p className="text-Orange-400 font-bold  ">Can´t be zero </p>)
+                }
             </div>
 
             <div className=" relative">
@@ -46,7 +55,7 @@ export const Input = ({ label, value, iconUrl, variant, setValue }: Props) => {
                     type="text"
                     onChange={handleChange}
                     value={localValue}
-                    className='bg-Grey-50 rounded-[5px] focus:outline-2 focus:outline-Green-400 cursor-pointer h-12 text-right pr-4 text-2xl font-bold text-Green-900 w-full'
+                    className={`bg-Grey-50 rounded-[5px] focus:outline-2  ${error ? "focus:outline-Orange-400" : "focus:outline-Green-400"} cursor-pointer h-12 text-right pr-4 text-2xl font-bold text-Green-900 w-full`}
                 />
                 <img src={iconUrl} alt="icon" className="absolute top-4 left-2" />
             </div>
